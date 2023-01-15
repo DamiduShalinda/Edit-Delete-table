@@ -1,31 +1,48 @@
 import { useState } from "react";
-import Form from "./form";
+import  { nanoid } from "nanoid";
 import data from "./names.json";
+import { ReadOnlyRow } from "./Components/ReadOnlyRow";
 
 function App() {
 
   const [contacts , setContacts] = useState(data);
-  const [ addFormData , setAddFormData] = useState({
-    
+
+  const [addFormData, setAddFormData] = useState({
     fullName: '',
     address: '',
     phoneNumber: '',
     email: ''
-  
-  });
+  })
 
-  const handleFormChange = (event) => {
+
+  function handleFormChange(event){
     event.preventDefault();
 
-    const fieldName = event.target.getAttribute("name");
+    const fieldName = event.target.getAttribute('name');
     const fieldValue = event.target.value;
 
-    const newFormData =  {...addFormData};
+    const newFormData = {...addFormData};
     newFormData[fieldName] = fieldValue;
 
     setAddFormData(newFormData);
-  }
 
+  };
+
+  const handleAddFormSubmit = (event) => {
+      event.preventDefault();
+
+      const newContact = {
+        id: nanoid(),
+        fullName: addFormData.fullName,
+        address: addFormData.address,
+        phoneNumber: addFormData.phoneNumber,
+        email: addFormData.email
+      };
+
+      const newContacts = [...contacts , newContact];
+      setContacts(newContacts);
+
+  }
 
   return (
     <div >
@@ -41,30 +58,20 @@ function App() {
       </thead>
       <tbody className="bg-blue-100 justify-center">
       {contacts.map((contact) => 
-      (<tr>
-        <td>{contact.fullName}</td>
-        <td>{contact.address}</td>
-        <td>{contact.phoneNumber}</td>
-        <td>{contact.email}</td>
-        <td> <div className="flex justify-center gap-5">
-        <button className="border  border-black-700 bg-gray-500 text-white px-3 rounded-md text-sm">Edit</button>
-        <button className="border  border-black-700 bg-gray-500 text-white px-3 rounded-md text-sm">Delete</button>
-        </div>
-        </td>
-        </tr>
-        ))}
+      <ReadOnlyRow contact={contact}/>
+        )}
       
       </tbody>
      </table>
      <div className="w-[90%] mx-auto  my-5">
         <h1> Add more details</h1>
         <br></br>
-        <form>
-            <input type="text" required placeholder="Name"name="fullName" className="border-2 mx-1 my-1" />
-            <input type="text" required placeholder="Address" name="address" className="border-2 mx-1 my-1"/>
-            <input type="text" required placeholder="Phone Number" name="phoneNumber" className="border-2 mx-1 my-1" />
-            <input type="email" required placeholder="E mail"name="email" className="border-2 mx-1 my-1"/>
-            <input type="submit" className="border border-black rounded-md"/>
+        <form onSubmit={handleAddFormSubmit}>
+            <input type="text" required="required" placeholder="Name" name="fullName" className="border-2 mx-1 my-1" onChange={handleFormChange}/>
+            <input type="text" required="required" placeholder="Address" name="address" className="border-2 mx-1 my-1" onChange={handleFormChange}/>
+            <input type="text" required="required" placeholder="Phone Number" name="phoneNumber" className="border-2 mx-1 my-1" onChange={handleFormChange}/>
+            <input type="email" required="required" placeholder="E mail" name="email" className="border-2 mx-1 my-1" onChange={handleFormChange}/>
+            <button type="submit" className="border border-black rounded-md">Submit</button>
         </form>
         </div>
     </div>
