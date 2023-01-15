@@ -1,7 +1,8 @@
-import { useState } from "react";
+import React, { Fragment, useState } from "react";
 import  { nanoid } from "nanoid";
 import data from "./names.json";
-import { ReadOnlyRow } from "./Components/ReadOnlyRow";
+import ReadOnlyRow from "./Components/ReadOnlyRow";
+import EditableRow from "./Components/EditableRow";
 
 function App() {
 
@@ -12,7 +13,16 @@ function App() {
     address: '',
     phoneNumber: '',
     email: ''
-  })
+  });
+
+  const [editContactId, setEditContactId] = useState(null);
+
+  const [editFormData , setEditFormData] = useState({
+    fullName: '',
+    address: '',
+    phoneNumber: '',
+    email: ''
+  });
 
 
   function handleFormChange(event){
@@ -42,10 +52,77 @@ function App() {
       const newContacts = [...contacts , newContact];
       setContacts(newContacts);
 
+  };
+
+
+  const handleEditFormChange = (event) => {
+    event.preventDefault();
+
+    const fieldName = event.target.getAttribute('name');
+    const fieldValue = event.target.value;
+
+    const newFormData = {...editFormData};
+    newFormData[fieldName] = fieldValue;
+
+    setEditFormData(newFormData);
   }
+
+  const handleEditFormSubmit = (event) => {
+    event.preventDefault();
+
+    const editedContact = {
+      id: editContactId,
+      fullName: editFormData.fullName,
+      address: editFormData.address,
+      phoneNumber: editFormData.phoneNumber,
+      email: editFormData.email,
+    };
+    
+      const newContacts = [...contacts];
+
+      const index = contacts.findIndex((contact) => contact.id === editContactId);
+
+      newContacts[index] = editedContact;
+
+      setContacts(newContacts);
+      setEditContactId(null);
+  };
+
+  const handleEditClick = (event , contact) => {
+    event.preventDefault();
+    setEditContactId(contact.id);
+
+    const formValues = {
+      fullName: contact.fullName,
+      address: contact.address,
+      phoneNumber: contact.phoneNumber,
+      email: contact.email
+    }
+
+    setEditFormData(formValues);
+  }
+
+  const handleCancelClick = (event) => {
+    event.preventDefault();
+    setEditContactId(null);
+  }
+
+  const handleDeleteClick = (contactId) => {
+
+    const newContacts = [...contacts];
+
+    const index = contacts.findIndex((contact) => contact.id === contact.id);
+
+    newContacts.splice(index , 1);
+    setContacts(newContacts);
+
+
+  }
+
 
   return (
     <div >
+    <form onSubmit={handleEditFormSubmit}>
      <table className="w-[90%] mx-auto  my-5">
       <thead className="bg-blue-300 justify-center ">
         <tr>
@@ -57,12 +134,19 @@ function App() {
         </tr>
       </thead>
       <tbody className="bg-blue-100 justify-center">
-      {contacts.map((contact) => 
-      <ReadOnlyRow contact={contact}/>
-        )}
+      {contacts.map((contact) => (
+        <Fragment>
+        {editContactId === contact.id ? (<EditableRow editFormData={editFormData} handleEditFormChange={handleEditFormChange} handleCancelClick={handleCancelClick}/>) 
+        : (<ReadOnlyRow contact={contact} handleEditClick={handleEditClick} handleDeleteClick={handleDeleteClick}/>)}
+        
+        
+        </Fragment>
+        
+      ))  }
       
       </tbody>
      </table>
+     </form>
      <div className="w-[90%] mx-auto  my-5">
         <h1> Add more details</h1>
         <br></br>

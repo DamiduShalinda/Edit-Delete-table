@@ -1,14 +1,17 @@
-import React from 'react'
+import React from "react";
 
-export const ReadOnlyRow = (contact) => {
+const ReadOnlyRow = ({ contact, handleEditClick, handleDeleteClick }) => {
   return (
-    <div>
     <tr>
-    <td>{contact.fullName}</td>
-    <td>{contact.address}</td>
-    <td>{contact.phoneNumber}</td>
-    <td>{contact.email}</td>
+      <td>{contact.fullName}</td>
+      <td>{contact.address}</td>
+      <td>{contact.phoneNumber}</td>
+      <td>{contact.email}</td>
+      <td><button className="border border-black px-1 rounded-md" onClick={event => handleEditClick(event,contact)}>Edit</button>
+          <button className="border border-black px-1 rounded-md" onClick={() => handleDeleteClick(contact.id)}>Delete</button>
+      </td>
     </tr>
-    </div>
-  )
-}
+  );
+};
+
+export default ReadOnlyRow;
